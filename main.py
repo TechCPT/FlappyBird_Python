@@ -34,6 +34,7 @@ def draw_pipes(pipes):
 def check_collision(pipes):
     for pipe in pipes:
         if bird_rect.colliderect(pipe):  # check if bird rectangle is colliding with any of the pipe rectangles
+            death_sound.play()
             return False
     if bird_rect.top <= -75 or bird_rect.bottom >= 675:
         return False
@@ -77,6 +78,8 @@ def update_score(score, high_score):
     return high_score
 
 
+# tells pygame to initialize mixer in a specific way
+pygame.mixer.pre_init(frequency=44100, size=16, channels=1, buffer=512)
 pygame.init()  # initializes all imported pygame modules
 # creates display surface stored in the screen variable, passes tuple of width and height as argument
 screen = pygame.display.set_mode((432, 768))
@@ -120,6 +123,14 @@ SPAWNPIPE = pygame.USEREVENT
 pygame.time.set_timer(SPAWNPIPE, 1200)
 pipe_height = [300, 450, 600]
 
+# convert_alpha will display the surface as intended without black pixels taking the place of empty pixels
+game_over_surface = pygame.transform.scale((pygame.image.load("assets/message.png").convert_alpha()), (276, 400))
+game_over_rect = game_over_surface.get_rect(center=(216, 384))
+
+flap_sound = pygame.mixer.Sound("sound/sfx_wing.wav")
+death_sound = pygame.mixer.Sound("sound/sfx_hit.wav")
+score_sound = pygame.mixer.Sound("sound/sfx_point.wav")
+score_sound_countdown = 100
 
 ''' --- GAME LOOP --- '''
 while True:
@@ -133,6 +144,7 @@ while True:
             if event.key == pygame.K_SPACE and game_active:
                 bird_movement = 0
                 bird_movement -= 9
+                flap_sound.play()
             if event.key == pygame.K_SPACE and not game_active:
                 game_active = True
                 pipe_list.clear()  # despawn all pipes
@@ -168,7 +180,12 @@ while True:
 
         score += 0.01
         score_display("main_game")
+        score_sound_countdown -= 1
+        if score_sound_countdown <= 0:
+            score_sound.play()
+            score_sound_countdown = 100
     else:
+        screen.blit(game_over_surface, game_over_rect)
         high_score = update_score(score, high_score)
         score_display("game_over")
 
