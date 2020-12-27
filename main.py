@@ -53,15 +53,42 @@ def bird_animation():
     return new_bird, new_bird_rect
 
 
+def score_display(game_state):
+    if game_state == "main_game":
+        # game_font.render(text, antialias, color as RGB tuple from 0-255)
+        # render text to be stored on new surface
+        score_surface = game_font.render(str(int(score)), False, (255, 255, 255))
+        score_rect = score_surface.get_rect(center=(216, 75))
+        screen.blit(score_surface, score_rect)
+    if game_state == "game_over":
+        # f string combine normal string with other kinds of variables by passing through { } brackets
+        score_surface = game_font.render(f'Score: {int(score)}', False, (255, 255, 255))
+        score_rect = score_surface.get_rect(center=(216, 75))
+        screen.blit(score_surface, score_rect)
+
+        high_score_surface = game_font.render(f'High Score: {int(high_score)}', False, (255, 255, 255))
+        high_score_rect = high_score_surface.get_rect(center=(216, 635))
+        screen.blit(high_score_surface, high_score_rect)
+
+
+def update_score(score, high_score):
+    if score > high_score:
+        high_score = score
+    return high_score
+
+
 pygame.init()  # initializes all imported pygame modules
 # creates display surface stored in the screen variable, passes tuple of width and height as argument
 screen = pygame.display.set_mode((432, 768))
 clock = pygame.time.Clock()  # allows the limitation of frame rate
+game_font = pygame.font.Font("04B_19.TTF", 40)
 
 # Game Variables
 gravity = 0.25
 bird_movement = 0
 game_active = True
+score = 0
+high_score = 0
 
 # convert isn't strictly necessary but it converts the image into a type of file that is easier to work with for pygame
 bg_surface = pygame.image.load("assets/background-day.png").convert()
@@ -111,6 +138,7 @@ while True:
                 pipe_list.clear()  # despawn all pipes
                 bird_rect.center = (100, 384)  # reset bird position
                 bird_movement = 0  # reset bird movement
+                score = 0  # reset score
 
         if event.type == SPAWNPIPE:
             pipe_list.extend(create_pipe())
@@ -137,6 +165,12 @@ while True:
         # Pipes
         pipe_list = move_pipes(pipe_list)
         draw_pipes(pipe_list)
+
+        score += 0.01
+        score_display("main_game")
+    else:
+        high_score = update_score(score, high_score)
+        score_display("game_over")
 
     # Floor
     floor_x_pos -= 1  # increments x position of floor surface
