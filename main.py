@@ -79,8 +79,9 @@ def update_score(score, high_score):
 
 
 # tells pygame to initialize mixer in a specific way
-pygame.mixer.pre_init(frequency=44100, size=16, channels=1, buffer=512)
+pygame.mixer.init(frequency=48000, size=-16, channels=1, buffer=1024)
 pygame.init()  # initializes all imported pygame modules
+pygame.display.set_caption("Flappy Bird")
 # creates display surface stored in the screen variable, passes tuple of width and height as argument
 screen = pygame.display.set_mode((432, 768))
 clock = pygame.time.Clock()  # allows the limitation of frame rate
@@ -107,7 +108,7 @@ bird_upflap = pygame.transform.scale((pygame.image.load("assets/bluebird-upflap.
 bird_frames = [bird_downflap, bird_midflap, bird_upflap]
 bird_index = 0
 bird_surface = bird_frames[bird_index]
-bird_rect = bird_surface.get_rect(center=(100, 384))
+bird_rect = bird_surface.get_rect(center=(100, 300))
 
 BIRDFLAP = pygame.USEREVENT + 1
 pygame.time.set_timer(BIRDFLAP, 200)
@@ -148,7 +149,7 @@ while True:
             if event.key == pygame.K_SPACE and not game_active:
                 game_active = True
                 pipe_list.clear()  # despawn all pipes
-                bird_rect.center = (100, 384)  # reset bird position
+                bird_rect.center = (100, 300)  # reset bird position
                 bird_movement = 0  # reset bird movement
                 score = 0  # reset score
 
