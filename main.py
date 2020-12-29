@@ -18,6 +18,7 @@ def create_pipe():
 def move_pipes(pipes):
     for pipe in pipes:
         pipe.centerx -= 5
+    # only display pipes that are on screen to improve processing speed
     visible_pipes = [pipe for pipe in pipes if pipe.right > -50]
     return visible_pipes
 
@@ -34,10 +35,12 @@ def draw_pipes(pipes):
 
 def check_collision(pipes):
     global can_score
+
     for pipe in pipes:
         if bird_rect.colliderect(pipe):  # check if bird rectangle is colliding with any of the pipe rectangles
             death_sound.play()
             return False
+
     if bird_rect.top <= -75 or bird_rect.bottom >= 675:
         can_score = True
         return False
@@ -86,10 +89,10 @@ def pipe_score_check():
 
     if pipe_list:
         for pipe in pipe_list:
-            if bird_rect.centerx == pipe.centerx and can_score:
+            if bird_rect.centerx == pipe.centerx and can_score:  # check if pipe is in the same position as bird
                 score += 1
                 score_sound.play()
-                can_score = False
+                can_score = False  # disable the possibility of scoring more than once per pipe
             if pipe.centerx < 0:
                 can_score = True
 
